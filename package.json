@@ -1,5 +1,5 @@
 {
-  "name": "react_hardhat_template",
+  "name": "dao",
   "version": "1.0.0",
   "description": "",
   "dependencies": {
@@ -19,7 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "author": "gregory@dappuniversity.com",
+  "author": "rsotomayor@hotmail.com",
   "license": "ISC",
   "eslintConfig": {
     "extends": [
@@ -40,7 +40,7 @@
     ]
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
-    "hardhat": "^2.10.1"
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "hardhat": "^2.16.1"
   }
 }
