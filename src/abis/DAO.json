@@ -21,6 +21,19 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "Finalize",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "id",
         "type": "uint256"
       },
@@ -84,6 +97,19 @@
       }
     ],
     "name": "createProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "finalizeProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
