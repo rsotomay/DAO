@@ -75,7 +75,26 @@
         "type": "address"
       }
     ],
-    "name": "Vote",
+    "name": "VoteAgainst",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_investor",
+        "type": "address"
+      }
+    ],
+    "name": "VoteFor",
     "type": "event"
   },
   {
@@ -83,6 +102,11 @@
       {
         "internalType": "string",
         "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_description",
         "type": "string"
       },
       {
@@ -148,6 +172,11 @@
         "type": "string"
       },
       {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
@@ -159,7 +188,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "votes",
+        "name": "votesFor",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "votesAgainst",
         "type": "uint256"
       },
       {
@@ -206,6 +240,19 @@
       }
     ],
     "name": "vote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "voteAgainst",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

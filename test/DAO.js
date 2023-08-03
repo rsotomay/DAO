@@ -97,7 +97,12 @@ describe("DAO", () => {
       beforeEach(async () => {
         transaction = await dao
           .connect(investor1)
-          .createProposal("Proposal 1", ether(100), recipient.getAddress());
+          .createProposal(
+            "Proposal 1",
+            "Proposal Description Test",
+            ether(100),
+            recipient.getAddress()
+          );
         result = await transaction.wait();
       });
 
@@ -109,6 +114,7 @@ describe("DAO", () => {
         const proposal = await dao.proposals(1);
 
         expect(proposal.id).to.equal(1);
+        expect(proposal.description).to.equal("Proposal Description Test");
         expect(proposal.amount).to.equal(ether(100));
         expect(proposal.recipient).to.equal(await recipient.getAddress());
       });
@@ -119,18 +125,36 @@ describe("DAO", () => {
           .withArgs(
             1,
             ether(100),
-            recipient.getAddress,
+            await recipient.getAddress(),
             await investor1.getAddress()
           );
       });
     });
 
     describe("Failure", () => {
+      it("rejects empty description", async () => {
+        await expect(
+          dao
+            .connect(investor1)
+            .createProposal(
+              "Proposal 1",
+              "",
+              ether(100),
+              recipient.getAddress()
+            )
+        ).to.be.reverted;
+      });
+
       it("rejects invalid amount", async () => {
         await expect(
           dao
             .connect(investor1)
-            .createProposal("Proposal 1", ether(1000), recipient.getAddress())
+            .createProposal(
+              "Proposal 1",
+              "Proposal Description Test",
+              ether(1000),
+              recipient.getAddress()
+            )
         ).to.be.reverted;
       });
 
@@ -138,7 +162,12 @@ describe("DAO", () => {
         await expect(
           dao
             .connect(user)
-            .createProposal("Proposal 1", ether(100), recipient.getAddress())
+            .createProposal(
+              "Proposal 1",
+              "Proposal Description Test",
+              ether(100),
+              recipient.getAddress()
+            )
         ).to.be.reverted;
       });
     });
@@ -150,7 +179,12 @@ describe("DAO", () => {
     beforeEach(async () => {
       transaction = await dao
         .connect(investor1)
-        .createProposal("Proposal 1", ether(100), recipient.getAddress());
+        .createProposal(
+          "Proposal 1",
+          "Proposal Description Test",
+          ether(100),
+          recipient.getAddress()
+        );
       result = await transaction.wait();
     });
 
@@ -162,12 +196,12 @@ describe("DAO", () => {
 
       it("updates vote count", async () => {
         const proposal = await dao.proposals(1);
-        expect(proposal.votes).to.equal(tokens(200000));
+        expect(proposal.votesFor).to.equal(tokens(200000));
       });
 
-      it("emits a vote event", async () => {
+      it("emits a vote for event", async () => {
         await expect(transaction)
-          .to.emit(dao, "Vote")
+          .to.emit(dao, "VoteFor")
           .withArgs(1, await investor1.getAddress());
       });
     });
@@ -186,6 +220,53 @@ describe("DAO", () => {
     });
   });
 
+  describe("Voting Against", () => {
+    let transaction, result;
+
+    beforeEach(async () => {
+      transaction = await dao
+        .connect(investor1)
+        .createProposal(
+          "Proposal 1",
+          "Proposal Description Test",
+          ether(100),
+          recipient.getAddress()
+        );
+      result = await transaction.wait();
+    });
+
+    describe("Success", () => {
+      beforeEach(async () => {
+        transaction = await dao.connect(investor1).voteAgainst(1);
+        result = await transaction.wait();
+      });
+
+      it("updates vote against count", async () => {
+        const proposal = await dao.proposals(1);
+        expect(proposal.votesAgainst).to.equal(tokens(200000));
+      });
+
+      it("emits a vote agaianst event", async () => {
+        await expect(transaction)
+          .to.emit(dao, "VoteAgainst")
+          .withArgs(1, await investor1.getAddress());
+      });
+    });
+
+    describe("Failure", () => {
+      it("rejects non-investor ", async () => {
+        await expect(dao.connect(user).voteAgainst(1)).to.be.reverted;
+      });
+
+      it("rejects double voting ", async () => {
+        transaction = await dao.connect(investor1).voteAgainst(1);
+        await transaction.wait();
+
+        await expect(dao.connect(investor1).voteAgainst(1)).to.be.reverted;
+      });
+    });
+  });
+
   describe("Govenance", () => {
     let transaction, result;
 
@@ -194,7 +275,12 @@ describe("DAO", () => {
         // create proposal
         transaction = await dao
           .connect(investor1)
-          .createProposal("Proposal 1", ether(100), recipient.getAddress());
+          .createProposal(
+            "Proposal 1",
+            "Proposal Description Test",
+            ether(100),
+            recipient.getAddress()
+          );
         result = await transaction.wait();
         // Vote
         transaction = await dao.connect(investor1).vote(1);
@@ -231,7 +317,12 @@ describe("DAO", () => {
         // create proposal
         transaction = await dao
           .connect(investor1)
-          .createProposal("Proposal 1", ether(100), recipient.getAddress());
+          .createProposal(
+            "Proposal 1",
+            "Proposal Description Test",
+            ether(100),
+            recipient.getAddress()
+          );
         result = await transaction.wait();
         // Vote
         transaction = await dao.connect(investor1).vote(1);
@@ -252,7 +343,7 @@ describe("DAO", () => {
         await expect(dao.connect(user).finalizeProposal(1)).to.be.reverted;
       });
 
-      it("rejects ptoposal if already finalized", async () => {
+      it("rejects proposal if already finalized", async () => {
         //vote 3
         transaction = await dao.connect(investor3).vote(1);
         await transaction.wait();

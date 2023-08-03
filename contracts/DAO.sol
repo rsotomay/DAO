@@ -12,15 +12,18 @@ contract DAO {
     struct Proposal {
         uint256 id;
         string name;
+        string description;
         uint256 amount;
         address payable recipient;
-        uint256 votes;
+        uint256 votesFor;
+        uint256 votesAgainst;
         bool finalized;
     }
 
     uint256 public proposalCount;
     mapping(uint256 => Proposal) public proposals;
     mapping(address => mapping(uint256 => bool)) votes;
+    mapping(address => mapping(uint256 => bool)) _votesAgainst;
 
 
     event Propose(
@@ -30,7 +33,8 @@ contract DAO {
         address creator
     );
 
-    event Vote(uint256 _id, address _investor);
+    event VoteFor(uint256 _id, address _investor);
+    event VoteAgainst(uint256 _id, address _investor);
     event Finalize(uint256 _id);
 
     constructor(Token _token, uint256 _quorum) {
@@ -48,35 +52,53 @@ contract DAO {
 
     function createProposal(
         string memory _name, 
+        string memory _description,
         uint256 _amount, 
         address payable _recipient
         ) external onlyInvestor {
-            require(address(this).balance >= _amount );
+        require(bytes(_description).length > 0, "Description cannot be empty");
+        require(address(this).balance >= _amount );
         proposalCount ++;
         //create proposal
         proposals[proposalCount] = Proposal(
-            proposalCount, _name, 
-            _amount, _recipient, 
+            proposalCount, _name,
+            _description, 
+            _amount, 
+            _recipient, 
+            0,
             0, 
             false);
 
             emit Propose(proposalCount, _amount, _recipient, msg.sender);
     }
 
+    function noVoteTwice(uint256 _id) internal view {
+        // Don't let investor vote twice
+        require(!votes[msg.sender][_id], 'Already voted');
+        require(!_votesAgainst[msg.sender][_id], 'Already voted');
+    }
+
      // Vote for proposal
     function vote(uint256 _id) external onlyInvestor {
+        noVoteTwice(_id);
         // Fetch proposal from mapping by id
         // creates a variable called proposal of data type Proposal(struct) where it stores the id of the proposal
         // the investor is voting for.
         Proposal storage proposal = proposals[_id];
-        // Don't let investor vote twice
-        require(!votes[msg.sender][_id], 'Already voted');
         // update votes for proposal with _id by the balance amount of the caller
-       proposal.votes += token.balanceOf(msg.sender);
+       proposal.votesFor += token.balanceOf(msg.sender);
         // track user has voted
         votes[msg.sender][_id] = true;
         //emit an event
-        emit Vote(_id, msg.sender);
+        emit VoteFor(_id, msg.sender);
+    }
+
+    function voteAgainst(uint256 _id) external onlyInvestor {
+        noVoteTwice(_id);
+        Proposal storage proposal = proposals[_id];
+        proposal.votesAgainst += token.balanceOf(msg.sender);
+        _votesAgainst[msg.sender][_id] = true;
+        emit VoteAgainst(_id, msg.sender);
     }
 
     //Finalize proposal & transfer funds
@@ -90,7 +112,8 @@ contract DAO {
          proposal.finalized = true;
 
          //Check that proposal has enough votes
-         require(proposal.votes >= quorum, 'must reach quorum to finalize proposal');
+         require(proposal.votesFor >= quorum, 'must reach quorum to finalize proposal');
+         require(proposal.votesFor > proposal.votesAgainst, 'Proposal has not been approvd');
 
          //Check the contract has enough ether
          require(address(this).balance >= proposal.amount);

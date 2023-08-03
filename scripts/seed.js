@@ -60,7 +60,12 @@ async function main() {
     // Create Proposal
     transaction = await dao
       .connect(investor1)
-      .createProposal(`Proposal ${i + 1}`, ether(100), recipient.address);
+      .createProposal(
+        `Proposal ${i + 1}`,
+        `Desc ${i + 1}`,
+        ether(100),
+        recipient.address
+      );
     await transaction.wait();
 
     // Vote 1
@@ -87,7 +92,7 @@ async function main() {
   // Create one more proposal
   transaction = await dao
     .connect(investor1)
-    .createProposal(`Proposal 4`, ether(100), recipient.address);
+    .createProposal(`Proposal 4`, "Last one", ether(100), recipient.address);
   await transaction.wait();
 
   // Vote 1
