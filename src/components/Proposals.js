@@ -75,16 +75,15 @@ const Proposals = ({
             <td>{ethers.formatUnits(proposal.votesFor.toString())}</td>
             <td>{ethers.formatUnits(proposal.votesAgainst.toString())}</td>
             <td>
-              {!proposal.finalized &&
-                dao.votes[account]?.[proposal.id.toString()] && (
-                  <Button
-                    variant="primary"
-                    style={{ width: "100%" }}
-                    onClick={() => voteHandler(proposal.id)}
-                  >
-                    Vote
-                  </Button>
-                )}
+              {!proposal.finalized && (
+                <Button
+                  variant="primary"
+                  style={{ width: "100%" }}
+                  onClick={() => voteHandler(proposal.id)}
+                >
+                  Vote
+                </Button>
+              )}
             </td>
             <td>
               {!proposal.finalized && (

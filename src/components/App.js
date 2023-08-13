@@ -24,7 +24,6 @@ function App() {
 
   const [proposals, setProposals] = useState(null);
   const [quorum, setQuorum] = useState(null);
-  const [votes, setVotes] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
