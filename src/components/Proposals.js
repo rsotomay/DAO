@@ -2,11 +2,30 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import { ethers } from "ethers";
 
-const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
+const Proposals = ({
+  provider,
+  dao,
+  proposals,
+  quorum,
+  account,
+  setIsLoading,
+}) => {
   const voteHandler = async (id) => {
     try {
       const signer = await provider.getSigner();
       const transaction = await dao.connect(signer).vote(id);
+      await transaction.wait();
+    } catch {
+      window.alert("User rejected or transaction reverted");
+    }
+
+    setIsLoading(true);
+  };
+
+  const voteAgainstHandler = async (id) => {
+    try {
+      const signer = await provider.getSigner();
+      const transaction = await dao.connect(signer).voteAgainst(id);
       await transaction.wait();
     } catch {
       window.alert("User rejected or transaction reverted");
@@ -29,7 +48,7 @@ const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
 
   return (
     <Table striped bordered hover responsive>
-      <thead>
+      <thead className="text-center">
         <tr>
           <th>#</th>
           <th>Proposal Name</th>
@@ -37,8 +56,10 @@ const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
           <th>Recipient Address</th>
           <th>Amount</th>
           <th>Status</th>
-          <th>Total Votes</th>
-          <th>Cast Vote</th>
+          <th>Votes For</th>
+          <th>Votes Againts</th>
+          <th>Cast Vote For</th>
+          <th>Cast Vote Against</th>
           <th>Finalize</th>
         </tr>
       </thead>
@@ -51,20 +72,33 @@ const Proposals = ({ provider, dao, proposals, quorum, setIsLoading }) => {
             <td>{proposal.recipient}</td>
             <td>{ethers.formatUnits(proposal.amount, "ether")} ETH</td>
             <td>{proposal.finalized ? "Approved" : "In Progress"}</td>
-            <td>{proposal.votesFor.toString()}</td>
+            <td>{ethers.formatUnits(proposal.votesFor.toString())}</td>
+            <td>{ethers.formatUnits(proposal.votesAgainst.toString())}</td>
             <td>
-              {!proposal.finalized && !proposal && (
+              {!proposal.finalized &&
+                dao.votes[account]?.[proposal.id.toString()] && (
+                  <Button
+                    variant="primary"
+                    style={{ width: "100%" }}
+                    onClick={() => voteHandler(proposal.id)}
+                  >
+                    Vote
+                  </Button>
+                )}
+            </td>
+            <td>
+              {!proposal.finalized && (
                 <Button
                   variant="primary"
                   style={{ width: "100%" }}
-                  onClick={() => voteHandler(proposal.id)}
+                  onClick={() => voteAgainstHandler(proposal.id)}
                 >
                   Vote
                 </Button>
               )}
             </td>
             <td>
-              {!proposal.finalized && proposal.votes > quorum && (
+              {!proposal.finalized && proposal.votesFor > quorum && (
                 <Button
                   variant="primary"
                   style={{ width: "100%" }}

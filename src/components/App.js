@@ -24,6 +24,7 @@ function App() {
 
   const [proposals, setProposals] = useState(null);
   const [quorum, setQuorum] = useState(null);
+  const [votes, setVotes] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -52,17 +53,20 @@ function App() {
     const account = ethers.getAddress(accounts[0]);
     setAccount(account);
 
-    //fetch recipient account balance
-    let recipientBalance = await provider.getBalance(accounts[4]);
-    recipientBalance = ethers.formatUnits(recipientBalance, 18);
-    setRecipientBalance(recipientBalance);
-
     // Fetch proposals count
     const count = await dao.proposalCount();
     const items = [];
 
     for (var i = 0; i < count; i++) {
       const proposal = await dao.proposals(i + 1);
+
+      // fetch recipient account balance
+      let recipientBalance = await provider.getBalance(
+        await proposal.recipient
+      );
+      recipientBalance = ethers.formatUnits(recipientBalance, 18);
+      // proposal.recipient = recipientBalance;
+      setRecipientBalance(recipientBalance);
       items.push(proposal);
     }
 
@@ -111,6 +115,7 @@ function App() {
             dao={dao}
             proposals={proposals}
             quorum={quorum}
+            account={account}
             setIsLoading={setIsLoading}
           />
         </>
