@@ -243,7 +243,12 @@ describe("DAO", () => {
 
       it("updates vote against count", async () => {
         const proposal = await dao.proposals(1);
-        expect(proposal.votesAgainst).to.equal(tokens(200000));
+        expect(proposal.votesAgainst).to.equal(1);
+      });
+
+      it("updates vote for count", async () => {
+        const proposal = await dao.proposals(1);
+        expect(proposal.votesFor).to.equal(tokens(0));
       });
 
       it("emits a vote agaianst event", async () => {

@@ -73,7 +73,7 @@ const Proposals = ({
             <td>{ethers.formatUnits(proposal.amount, "ether")} ETH</td>
             <td>{proposal.finalized ? "Approved" : "In Progress"}</td>
             <td>{ethers.formatUnits(proposal.votesFor.toString())}</td>
-            <td>{ethers.formatUnits(proposal.votesAgainst.toString())}</td>
+            <td className="text-center">{proposal.votesAgainst.toString()}</td>
             <td>
               {!proposal.finalized && (
                 <Button
