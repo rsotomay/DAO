@@ -25,6 +25,8 @@ function App() {
   const [proposals, setProposals] = useState(null);
   const [quorum, setQuorum] = useState(null);
 
+  const [votedFor, setVotedFor] = useState(false);
+  const [votedAgainst, setVotedAgainst] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadBlockchainData = async () => {
@@ -71,6 +73,13 @@ function App() {
 
     setProposals(items);
 
+    //Fetch votedFor
+    const votedFor = await dao.votedFor(account, count);
+    setVotedFor(votedFor);
+    //Fetch votedAgaianst
+    const votedAgainst = await dao.votedAgainst(account, count);
+    setVotedAgainst(votedAgainst);
+
     // Fetch quorum
     setQuorum(await dao.quorum());
 
@@ -115,6 +124,8 @@ function App() {
             proposals={proposals}
             quorum={quorum}
             account={account}
+            votedFor={votedFor}
+            votedAgainst={votedAgainst}
             setIsLoading={setIsLoading}
           />
         </>

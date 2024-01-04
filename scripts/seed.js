@@ -17,6 +17,7 @@ async function main() {
   const investor2 = accounts[2];
   const investor3 = accounts[3];
   const recipient = accounts[4];
+  const investor4 = accounts[5];
 
   let transaction;
 
@@ -40,6 +41,9 @@ async function main() {
   await transaction.wait();
 
   transaction = await token.transfer(investor3.address, tokens(200000));
+  await transaction.wait();
+
+  transaction = await token.transfer(investor4.address, tokens(200000));
   await transaction.wait();
 
   console.log(`Fetching dao...\n`);

@@ -7,10 +7,13 @@ const Proposals = ({
   dao,
   proposals,
   quorum,
-  account,
+  votedFor,
+  votedAgainst,
   setIsLoading,
 }) => {
   const voteHandler = async (id) => {
+    // const votedFor = await dao.votedFor(account, id);
+    // setVotedFor(votedFor);
     try {
       const signer = await provider.getSigner();
       const transaction = await dao.connect(signer).vote(id);
@@ -75,7 +78,7 @@ const Proposals = ({
             <td>{ethers.formatUnits(proposal.votesFor.toString())}</td>
             <td className="text-center">{proposal.votesAgainst.toString()}</td>
             <td>
-              {!proposal.finalized && (
+              {!proposal.finalized && !votedFor && !votedAgainst && (
                 <Button
                   variant="primary"
                   style={{ width: "100%" }}
@@ -86,7 +89,7 @@ const Proposals = ({
               )}
             </td>
             <td>
-              {!proposal.finalized && (
+              {!proposal.finalized && !votedFor && !votedAgainst && (
                 <Button
                   variant="primary"
                   style={{ width: "100%" }}

@@ -22,8 +22,8 @@ contract DAO {
 
     uint256 public proposalCount;
     mapping(uint256 => Proposal) public proposals;
-    mapping(address => mapping(uint256 => bool)) votes;
-    mapping(address => mapping(uint256 => bool)) _votesAgainst;
+    mapping(address => mapping(uint256 => bool)) public votes;
+    mapping(address => mapping(uint256 => bool)) public _votesAgainst;
 
 
     event Propose(
@@ -48,6 +48,14 @@ contract DAO {
     modifier onlyInvestor() {
         require(token.balanceOf(msg.sender) > 0, 'Must be token holder');
         _;
+    }
+
+    function votedFor(address _address, uint256 _id) public view returns (bool) {
+        return votes[_address][_id];
+    }
+
+    function votedAgainst(address _address, uint256 _id) public view returns (bool) {
+        return _votesAgainst[_address][_id];
     }
 
     function createProposal(

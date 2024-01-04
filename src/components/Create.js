@@ -15,6 +15,10 @@ const Create = ({ provider, dao, setIsLoading }) => {
     e.preventDefault();
     setIsWaiting(true);
 
+    if (!description) {
+      window.alert("Please enter proposal's description");
+    }
+
     try {
       const signer = await provider.getSigner();
       const formattedAmount = ethers.parseUnits(amount.toString(), "ether");
