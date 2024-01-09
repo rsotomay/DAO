@@ -42,7 +42,7 @@ contract DAO {
         token = _token;
         quorum = _quorum;
     }
-//Allow contract to receive eth
+//Allow contract to receive Eth
     receive() external payable {}
 
     modifier onlyInvestor() {
